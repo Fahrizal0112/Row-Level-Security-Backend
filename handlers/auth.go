@@ -87,7 +87,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
         Role:     "user",
     }
 
-    if err := h.DB.Create(&user).Error; err != nil {
+    err = h.DB.Create(&user).Error
+    if err != nil {
         c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
         return
     }
