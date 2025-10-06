@@ -1,0 +1,748 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Row Level Security API",
+		"description": "API testing untuk backend dengan Row Level Security menggunakan Go dan PostgreSQL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User - Tenant 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('auth_token_tenant1', response.token);",
+									"    pm.environment.set('user_id_tenant1', response.user.id);",
+									"    pm.test('Registration successful', function () {",
+									"        pm.expect(response.token).to.not.be.empty;",
+									"    });",
+									"} else {",
+									"    pm.test('Registration failed', function () {",
+									"        pm.expect(pm.response.code).to.equal(201);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user1@tenant1.com\",\n    \"password\": \"password123\",\n    \"name\": \"User One Tenant 1\",\n    \"tenant_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Tenant 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('auth_token_tenant2', response.token);",
+									"    pm.environment.set('user_id_tenant2', response.user.id);",
+									"    pm.test('Registration successful', function () {",
+									"        pm.expect(response.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user1@tenant2.com\",\n    \"password\": \"password123\",\n    \"name\": \"User One Tenant 2\",\n    \"tenant_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Tenant 1 User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('auth_token_tenant1', response.token);",
+									"    pm.test('Login successful', function () {",
+									"        pm.expect(response.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user1@tenant1.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Tenant 2 User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('auth_token_tenant2', response.token);",
+									"    pm.test('Login successful', function () {",
+									"        pm.expect(response.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user1@tenant2.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts - Tenant 1",
+			"item": [
+				{
+					"name": "Create Public Post - Tenant 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('post_id_tenant1_public', response.id);",
+									"    pm.test('Post created successfully', function () {",
+									"        pm.expect(response.title).to.equal('Public Post from Tenant 1');",
+									"        pm.expect(response.is_public).to.be.true;",
+									"        pm.expect(response.tenant_id).to.equal(1);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Public Post from Tenant 1\",\n    \"content\": \"This is a public post that should be visible to other users in the same tenant\",\n    \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Private Post - Tenant 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('post_id_tenant1_private', response.id);",
+									"    pm.test('Private post created successfully', function () {",
+									"        pm.expect(response.title).to.equal('Private Post from Tenant 1');",
+									"        pm.expect(response.is_public).to.be.false;",
+									"        pm.expect(response.tenant_id).to.equal(1);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Private Post from Tenant 1\",\n    \"content\": \"This is a private post that should only be visible to the author\",\n    \"is_public\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Posts - Tenant 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Should only see posts from tenant 1', function () {",
+									"        response.forEach(post => {",
+									"            pm.expect(post.tenant_id).to.equal(1);",
+									"        });",
+									"    });",
+									"    pm.test('Should see public posts and own private posts', function () {",
+									"        const publicPosts = response.filter(post => post.is_public);",
+									"        const privatePosts = response.filter(post => !post.is_public);",
+									"        pm.expect(publicPosts.length).to.be.greaterThan(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Post - Tenant 1",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant1_public}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant1_public}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post - Tenant 1",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Public Post from Tenant 1\",\n    \"content\": \"This post has been updated to test the update functionality\",\n    \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant1_public}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant1_public}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts - Tenant 2",
+			"item": [
+				{
+					"name": "Create Public Post - Tenant 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('post_id_tenant2_public', response.id);",
+									"    pm.test('Post created successfully', function () {",
+									"        pm.expect(response.title).to.equal('Public Post from Tenant 2');",
+									"        pm.expect(response.is_public).to.be.true;",
+									"        pm.expect(response.tenant_id).to.equal(2);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant2}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Public Post from Tenant 2\",\n    \"content\": \"This is a public post from tenant 2 - should not be visible to tenant 1 users\",\n    \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Posts - Tenant 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Should only see posts from tenant 2', function () {",
+									"        response.forEach(post => {",
+									"            pm.expect(post.tenant_id).to.equal(2);",
+									"        });",
+									"    });",
+									"    pm.test('Should NOT see posts from tenant 1', function () {",
+									"        const tenant1Posts = response.filter(post => post.tenant_id === 1);",
+									"        pm.expect(tenant1Posts.length).to.equal(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant2}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Row Level Security Tests",
+			"item": [
+				{
+					"name": "Cross-Tenant Access Test - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Should not be able to access other tenant posts', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([404, 403]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant2_public}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant2_public}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Other Tenant Post - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Should not be able to update other tenant posts', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([404, 403]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Trying to hack other tenant post\",\n    \"content\": \"This should not work due to RLS\",\n    \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant2_public}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant2_public}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Other Tenant Post - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Should not be able to delete other tenant posts', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([404, 403]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant2_public}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant2_public}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Access Without Token - Should Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Should require authentication', function () {",
+									"    pm.expect(pm.response.code).to.equal(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cleanup",
+			"item": [
+				{
+					"name": "Delete Post - Tenant 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Post deleted successfully', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token_tenant1}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/posts/{{post_id_tenant1_private}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								"{{post_id_tenant1_private}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
