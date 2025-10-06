@@ -23,7 +23,6 @@ type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
 	Name     string `json:"name" binding:"required"`
-	TenantID uint   `json:"tenant_id" binding:"required"`
 }
 
 func NewAuthHandler(db *gorm.DB) *AuthHandler {
@@ -48,7 +47,12 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.TenantID, user.Role)
+	var tenantID uint = 0
+	if user.TenantID != nil {
+		tenantID = *user.TenantID
+	}
+
+	token, err := utils.GenerateJWT(user.ID, tenantID, user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -67,12 +71,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	var tenant models.Tenant
-	if err := h.DB.First(&tenant, req.TenantID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tenant"})
-		return
-	}
-
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
@@ -83,17 +81,22 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Email:    req.Email,
 		Password: hashedPassword,
 		Name:     req.Name,
-		TenantID: req.TenantID,
+		TenantID: nil,
 		Role:     "user",
+		
 	}
-
 	err = h.DB.Create(&user).Error
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
 		return
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.TenantID, user.Role)
+	var tenantID uint = 0
+	if user.TenantID != nil {
+		tenantID = *user.TenantID
+	}
+
+	token, err := utils.GenerateJWT(user.ID, tenantID, user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return

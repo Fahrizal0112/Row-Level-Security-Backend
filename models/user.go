@@ -11,14 +11,14 @@ type User struct {
 	Email     string         `json:"email" gorm:"uniqueIndex;not null"`
 	Password  string         `json:"-" gorm:"not null"`
 	Name      string         `json:"name" gorm:"not null"`
-	TenantID  uint           `json:"tenant_id" gorm:"notnull;default:'user'"`
+	TenantID  *uint          `json:"tenant_id" gorm:"index"`
 	Role      string         `json:"role" gorm:"not null;default:'user'"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Tenant Tenant `json:"tenant" gorm:"foreignKey:TenantID"`
-	Posts  []Post `json:"posts,omitempty" gorm:"foreignKey:UserID"`
+	Tenant *Tenant `json:"tenant,omitempty" gorm:"foreignKey:TenantID"`
+	Posts  []Post  `json:"posts,omitempty" gorm:"foreignKey:UserID"`
 }
 
 type Tenant struct {

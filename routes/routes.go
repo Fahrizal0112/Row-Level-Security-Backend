@@ -8,30 +8,33 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(router *gin.Engine, db *gorm.DB) {
+func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	authHandler := handlers.NewAuthHandler(db)
-	postHandler := handlers.NewPostHandler(db)
+	postsHandler := handlers.NewPostHandler(db)
+	tenantHandler := handlers.NewTenantHandler(db)
 
-	api := router.Group("/api/v1")
+	api := r.Group("/api/v1")
+	
+	auth := api.Group("/auth")
 	{
-		auth := api.Group("/auth")
-		{
-			auth.POST("/login", authHandler.Login)
-			auth.POST("/register", authHandler.Register)
-		}
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/login", authHandler.Login)
 	}
 
-	protected := api.Group("/")
-	protected.Use(middleware.AuthMiddleware())
-	protected.Use(middleware.RLSMiddleware())
+	tenant := api.Group("/tenant")
+	tenant.Use(middleware.AuthMiddleware())
 	{
-		posts := protected.Group("/posts")
-		{
-			posts.POST("", postHandler.CreatePost)
-			posts.GET("", postHandler.GetPosts)
-			posts.GET("/:id", postHandler.GetPost)
-			posts.PUT("/:id", postHandler.UpdatePost)
-			posts.DELETE("/:id", postHandler.DeletePost)
-		}
+		tenant.POST("/", tenantHandler.CreateTenant)
+		tenant.GET("/", tenantHandler.GetMyTenant)
+	}
+
+	posts := api.Group("/posts")
+	posts.Use(middleware.AuthMiddleware())
+	{
+		posts.POST("/", postsHandler.CreatePost)
+		posts.GET("/", postsHandler.GetPosts)
+		posts.GET("/:id", postsHandler.GetPost)
+		posts.PUT("/:id", postsHandler.UpdatePost)
+		posts.DELETE("/:id", postsHandler.DeletePost)
 	}
 }
